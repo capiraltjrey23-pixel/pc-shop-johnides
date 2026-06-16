@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="fil" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PC Shop ni Johnides — Computer Parts Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  /* ===== :root = DARK (default). [data-theme="light"] overrides. ===== */
+  :root {
+    --bg: #0A111E;
+    --surface: #111C2E;
+    --ink: #E7EEF9;
+    --brand: #4DA3FF;
+    --brand-2: #7CC4FF;
+    --accent: #FF8A3D;
+    --accent-ink: #2A1400;
+    --accent-soft: #2A2012;
+    --muted: #8497B0;
+    --line: #20304A;
+    --panel: #0C1525;
+    --danger: #FF6B6B;
+    --grid-line: rgba(77,163,255,.10);
+    --shadow: 0 20px 55px -25px rgba(0,0,0,.8);
+    --radius: 14px;
+    --display: "Space Grotesk", system-ui, sans-serif;
+    --body: "Inter", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+  [data-theme="light"] {
+    --bg: #EDF1F8;
+    --surface: #FFFFFF;
+    --ink: #0E1B30;
+    --brand: #1E63D6;
+    --brand-2: #2B7BE6;
+    --accent: #E8730F;
+    --accent-ink: #FFF6EE;
+    --accent-soft: #FCE6D2;
+    --muted: #5C6B82;
+    --line: #D7E0EE;
+    --panel: #F3F7FC;
+    --danger: #C0392B;
+    --grid-line: rgba(30,99,214,.07);
+    --shadow: 0 18px 45px -24px rgba(20,40,80,.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--body);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    transition: background .3s ease, color .3s ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; animation: none !important; }
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input, select, textarea { font-family: inherit; font-size: 1rem; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+  .wrap { width: min(1140px, 92vw); margin: 0 auto; }
+
+  /* ---------- Header ---------- */
+  header.site {
+    position: sticky; top: 0; z-index: 60;
+    background: color-mix(in srgb, var(--bg) 84%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar { display: flex; align-items: center; gap: 18px; padding: 13px 0; }
+  .brand {
+    display: flex; align-items: center; gap: 11px;
+    font-family: var(--display); font-weight: 700; font-size: 1.22rem;
+    color: var(--ink); letter-spacing: -.02em; text-decoration: none;
+  }
+  .brand .mark {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--brand), var(--brand-2));
+    color: #04101F; display: grid; place-items: center; font-size: 1.15rem; font-weight: 700;
+  }
+  .brand small { display: block; font-family: var(--mono); font-size: .58rem; color: var(--brand); letter-spacing: .22em; font-weight: 500; }
+  nav.main { display: flex; gap: 2px; margin-left: 8px; }
+  nav.main a {
+    text-decoration: none; color: var(--muted); font-weight: 500;
+    padding: 8px 14px; border-radius: 8px; font-size: .92rem; transition: background .2s, color .2s;
+  }
+  nav.main a:hover { color: var(--ink); }
+  nav.main a.active { color: var(--brand); background: color-mix(in srgb, var(--brand) 14%, transparent); font-weight: 600; }
+  .bar .spacer { flex: 1; }
+  .icon-btn {
+    width: 42px; height: 42px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface);
+    display: grid; place-items: center; font-size: 1.1rem; transition: transform .15s, border-color .2s;
+  }
+  .icon-btn:hover { transform: translateY(-1px); border-color: var(--brand); }
+  .cart-btn { position: relative; }
+  .cart-badge {
+    position: absolute; top: -7px; right: -7px;
+    min-width: 21px; height: 21px; padding: 0 5px; border-radius: 999px;
+    background: var(--accent); color: var(--accent-ink);
+    font-family: var(--mono); font-weight: 700; font-size: .72rem;
+    display: grid; place-items: center; transform: scale(0); transition: transform .2s;
+  }
+  .cart-badge.show { transform: scale(1); }
+  .cart-badge.bump { animation: bump .35s ease; }
+  @keyframes bump { 0%,100%{transform:scale(1)} 40%{transform:scale(1.4)} }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative; overflow: hidden; border: 1px solid var(--line);
+    border-radius: 22px; margin-top: 22px; padding: clamp(34px, 6vw, 66px);
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--brand) 16%, var(--surface)) 0%, var(--surface) 60%);
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 30px 30px; mask-image: radial-gradient(120% 100% at 70% 0%, #000 30%, transparent 75%);
+  }
+  .hero > * { position: relative; }
+  .hero .eyebrow {
+    font-family: var(--mono); font-size: .76rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--brand); margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: var(--display); font-weight: 700; font-size: clamp(2.1rem, 5.6vw, 3.8rem);
+    line-height: 1.03; letter-spacing: -.03em; max-width: 18ch;
+  }
+  .hero h1 .hl { color: var(--brand); }
+  .hero p { margin-top: 16px; max-width: 50ch; font-size: 1.06rem; color: var(--muted); }
+  .hero .cta {
+    margin-top: 28px; display: inline-flex; align-items: center; gap: 10px;
+    background: var(--accent); color: var(--accent-ink); padding: 14px 26px; border-radius: 11px;
+    font-weight: 700; font-size: 1.02rem; text-decoration: none; transition: transform .15s;
+  }
+  .hero .cta:hover { transform: translateY(-2px); }
+  .hero .rig {
+    position: absolute; right: -6px; bottom: -30px; font-size: clamp(7rem, 17vw, 12rem);
+    filter: drop-shadow(0 14px 26px rgba(0,0,0,.4)); transform: rotate(-7deg); pointer-events: none; user-select: none;
+  }
+  @media (max-width: 760px){ .hero .rig { display: none; } }
+
+  /* ---------- Section head ---------- */
+  .sec-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin: 52px 0 16px; }
+  .sec-head h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.5rem,3.2vw,2.1rem); letter-spacing: -.02em; }
+  .sec-head .num { font-family: var(--mono); color: var(--accent); font-weight: 700; }
+
+  /* ---------- Controls ---------- */
+  .controls {
+    position: sticky; top: 70px; z-index: 40; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+    padding: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+  }
+  .search { position: relative; flex: 1; min-width: 210px; }
+  .search input {
+    width: 100%; padding: 12px 14px 12px 42px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  }
+  .search .ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: .5; }
+  .chips { display: flex; gap: 7px; flex-wrap: wrap; }
+  .chip {
+    padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--muted); font-weight: 600; font-size: .88rem; transition: all .16s;
+  }
+  .chip:hover { color: var(--ink); }
+  .chip.active { background: var(--brand); color: #04101F; border-color: var(--brand); }
+
+  /* ---------- Grid ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 16px; margin-top: 20px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    overflow: hidden; display: flex; flex-direction: column; transition: transform .18s, box-shadow .2s, border-color .2s;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--brand) 40%, var(--line)); }
+  .card .thumb {
+    height: 120px; display: grid; place-items: center; font-size: 3.4rem; position: relative;
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 22px 22px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 22px 22px,
+      color-mix(in srgb, var(--brand) 8%, var(--surface));
+  }
+  .pill {
+    position: absolute; top: 10px; left: 10px; z-index: 2; font-family: var(--mono); font-size: .64rem; font-weight: 700;
+    letter-spacing: .08em; padding: 3px 8px; border-radius: 5px; text-transform: uppercase;
+  }
+  .pill.intel  { background: rgba(0,113,197,.18);  color: #4FA8F0; border: 1px solid rgba(0,113,197,.5); }
+  .pill.amd    { background: rgba(237,28,36,.16);  color: #FF6B70; border: 1px solid rgba(237,28,36,.5); }
+  .pill.nvidia { background: rgba(118,185,0,.16);  color: #9BD64A; border: 1px solid rgba(118,185,0,.5); }
+  .pill.neutral{ background: color-mix(in srgb, var(--muted) 18%, transparent); color: var(--muted); border: 1px solid var(--line); }
+  .card .body { padding: 15px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .card .name { font-family: var(--display); font-weight: 600; font-size: 1rem; letter-spacing: -.01em; }
+  .card .spec { color: var(--muted); font-size: .82rem; flex: 1; font-family: var(--mono); }
+  .card .row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+  .card .price { font-family: var(--mono); font-weight: 700; font-size: 1.04rem; color: var(--brand); }
+  .add {
+    background: var(--accent); color: var(--accent-ink); font-weight: 700;
+    padding: 9px 14px; border-radius: 9px; font-size: .86rem; transition: transform .15s, filter .15s;
+  }
+  .add:hover { transform: translateY(-1px); filter: brightness(1.05); }
+  .empty-state { text-align: center; color: var(--muted); padding: 50px 10px; font-size: 1.02rem; }
+  .empty-state .big { font-size: 2.6rem; display: block; margin-bottom: 8px; }
+
+  /* ---------- Steps ---------- */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 15px; }
+  .step { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+  .step .n { font-family: var(--mono); font-weight: 700; color: var(--accent); font-size: 1.05rem; }
+  .step h3 { font-family: var(--display); font-size: 1.12rem; margin: 8px 0 6px; }
+  .step p { color: var(--muted); font-size: .9rem; }
+
+  /* ---------- About ---------- */
+  .about { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: clamp(26px,4vw,42px); }
+  .about p { color: var(--muted); max-width: 64ch; }
+  .about .stats { display: flex; gap: 38px; flex-wrap: wrap; margin-top: 22px; }
+  .about .stats b { font-family: var(--display); font-size: 1.85rem; color: var(--brand); display: block; }
+  .about .stats span { color: var(--muted); font-size: .84rem; }
+
+  footer.site { margin: 54px 0 30px; color: var(--muted); font-size: .85rem; text-align: center; }
+
+  /* ---------- Drawer (BUILD LIST) ---------- */
+  .scrim { position: fixed; inset: 0; background: rgba(4,10,20,.6); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 90; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed; top: 0; right: 0; height: 100dvh; width: min(430px, 93vw);
+    background: var(--panel); z-index: 100; transform: translateX(105%);
+    transition: transform .32s cubic-bezier(.4,0,.1,1);
+    display: flex; flex-direction: column; box-shadow: -22px 0 60px -22px rgba(0,0,0,.7);
+    border-left: 1px solid var(--line);
+  }
+  .drawer.open { transform: translateX(0); }
+  /* bawat view (cart/checkout/done) ay pupuno sa taas ng drawer kaya pinned ang footer */
+  .drawer > div { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 20px 22px 14px; border-bottom: 1px solid var(--line); }
+  .drawer-head h3 { font-family: var(--display); font-size: 1.28rem; }
+  .drawer-head .sub { font-family: var(--mono); font-size: .68rem; color: var(--brand); letter-spacing: .1em; }
+  .drawer-body { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 22px; }
+
+  .line-item { display: flex; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .line-item .emoji { font-size: 1.7rem; width: 38px; text-align: center; }
+  .line-item .info { flex: 1; min-width: 0; }
+  .line-item .info .nm { font-weight: 600; font-size: .92rem; }
+  .line-item .info .pr { font-family: var(--mono); font-size: .76rem; color: var(--muted); }
+  .qty { display: flex; align-items: center; gap: 8px; }
+  .qty button { width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--line); background: var(--surface); font-weight: 700; font-size: 1.05rem; line-height: 1; }
+  .qty button:hover { border-color: var(--brand); }
+  .qty .count { font-family: var(--mono); font-weight: 700; min-width: 18px; text-align: center; }
+  .line-item .rm { color: var(--danger); font-size: .76rem; font-weight: 700; background: none; }
+
+  .totals { font-family: var(--mono); padding: 16px 22px; border-top: 1px solid var(--line); }
+  .totals .t-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: .88rem; color: var(--muted); }
+  .totals .t-row.grand { font-size: 1.12rem; color: var(--ink); font-weight: 700; margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .drawer-foot { padding: 16px 22px 24px; }
+  .btn-primary {
+    width: 100%; background: var(--accent); color: var(--accent-ink); padding: 15px; border-radius: 11px;
+    font-weight: 700; font-size: 1.01rem; transition: filter .15s, transform .15s;
+  }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.06); }
+  .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-ghost { width: 100%; padding: 13px; border-radius: 11px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; margin-top: 10px; }
+
+  .cart-empty { text-align: center; color: var(--muted); padding: 50px 16px; }
+  .cart-empty .big { font-size: 3rem; display: block; margin-bottom: 10px; }
+
+  /* ---------- Form ---------- */
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-weight: 600; font-size: .86rem; margin-bottom: 6px; }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  }
+  .field textarea { resize: vertical; min-height: 62px; }
+  .field.invalid input, .field.invalid select, .field.invalid textarea { border-color: var(--danger); }
+  .field .err { color: var(--danger); font-size: .78rem; margin-top: 5px; display: none; font-weight: 600; }
+  .field.invalid .err { display: block; }
+  .pay { display: flex; gap: 10px; }
+  .pay label { flex: 1; border: 1px solid var(--line); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; font-weight: 600; font-size: .86rem; margin: 0; }
+  .pay input { display: none; }
+  .pay label:has(input:checked) { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 14%, transparent); color: var(--brand); }
+
+  /* ---------- Confirmation ---------- */
+  .confirm { text-align: center; padding: 10px 0; }
+  .confirm .seal { font-size: 3.2rem; }
+  .confirm h3 { font-family: var(--display); font-size: 1.5rem; margin: 8px 0; }
+  .confirm .ono { font-family: var(--mono); font-size: 1.02rem; background: color-mix(in srgb, var(--brand) 16%, transparent); color: var(--brand); display: inline-block; padding: 6px 14px; border-radius: 7px; margin: 6px 0 18px; }
+  .confirm .recap { text-align: left; font-family: var(--mono); font-size: .82rem; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 14px 0; margin: 10px 0; }
+  .confirm .recap .r { display: flex; justify-content: space-between; padding: 3px 0; gap: 12px; }
+  .confirm .eta { color: var(--muted); font-size: .88rem; margin-bottom: 16px; }
+
+  .hidden { display: none !important; }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 80px);
+    background: var(--brand); color: #04101F; padding: 13px 22px; border-radius: 10px;
+    font-weight: 600; z-index: 120; box-shadow: var(--shadow); opacity: 0;
+    transition: transform .3s, opacity .3s; max-width: 90vw;
+  }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+  @media (max-width: 640px){ nav.main { display: none; } .controls { top: 69px; } }
+
+  /* ---------- Part icons (inline SVG) ---------- */
+  .thumb svg { display: block; }
+  .line-item .emoji { display: flex; align-items: center; justify-content: center; }
+  .ic-line { stroke: var(--ink); stroke-width: 2.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .ic-acc  { stroke: var(--brand); stroke-width: 2.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .ic-body { fill: color-mix(in srgb, var(--brand) 13%, transparent); stroke: none; }
+  .ic-dot  { fill: var(--brand); stroke: none; }
+  .thumb .photo { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; object-fit: contain; padding: 8px; background: var(--surface); }
+</style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header class="site">
+  <div class="wrap bar">
+    <a href="#top" class="brand">
+      <span class="mark">JS</span>
+      <span>PC Shop ni Johnides <small>BUILD • UPGRADE • REPAIR</small></span>
+    </a>
+    <nav class="main" id="nav">
+      <a href="#parts" class="active">Parts</a>
+      <a href="#paano">Paano Bumili</a>
+      <a href="#tungkol">Tungkol</a>
+    </nav>
+    <div class="spacer"></div>
+    <button class="icon-btn" id="themeBtn" aria-label="Palitan ang tema">☀️</button>
+    <button class="icon-btn cart-btn" id="cartBtn" aria-label="Buksan ang cart">
+      🛒<span class="cart-badge" id="badge">0</span>
+    </button>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+
+  <!-- ===== Hero ===== -->
+  <section class="hero" id="home">
+    <div class="eyebrow">Intel • AMD • Nvidia • Radeon</div>
+    <h1>Buo mong build, <span class="hl">dito sa PC Shop ni Johding</span></h1>
+    <p>Legit na CPU, GPU, at lahat ng PC parts sa abot-kayang presyo. Pumili, i-add sa cart, at i-checkout — simple lang.</p>
+    <a href="#parts" class="cta">Mag-shop na →</a>
+    <div class="rig">🖥️</div>
+  </section>
+
+  <!-- ===== Parts ===== -->
+  <div class="sec-head" id="parts"><h2><span class="num">01 /</span> Parts Catalog</h2></div>
+
+  <div class="controls">
+    <div class="search">
+      <span class="ico">🔍</span>
+      <input type="text" id="search" placeholder="Maghanap… (hal. ryzen, intel, rtx)" aria-label="Maghanap ng parts" />
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <!-- ===== How ===== -->
+  <div class="sec-head" id="paano"><h2><span class="num">02 /</span> Paano Bumili</h2></div>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><h3>Pumili ng parts</h3><p>I-filter by category o maghanap, tapos i-tap ang “Idagdag”.</p></div>
+    <div class="step"><div class="n">2</div><h3>Tingnan ang build list</h3><p>Buksan ang cart, ayusin ang dami, tingnan ang kabuuang gastos.</p></div>
+    <div class="step"><div class="n">3</div><h3>Checkout</h3><p>Ilagay ang detalye at piliin kung COD o GCash.</p></div>
+    <div class="step"><div class="n">4</div><h3>Kunin ang quote</h3><p>May makukuha kang order number. Ihahatid o pwede pick-up sa shop.</p></div>
+  </div>
+
+  <!-- ===== About ===== -->
+  <div class="sec-head" id="tungkol"><h2><span class="num">03 /</span> Tungkol</h2></div>
+  <div class="about">
+    <p>Ang <b>PC Shop ni Johnides</b> ay tindahan ng computer parts para sa gamer, student, at content creator. Lahat ng item ay brand-new at may warranty. Nag-a-assemble din kami ng custom build kung kailangan mo ng tulong sa compatibility.</p>
+    <div class="stats">
+      <div><b>20,000+</b><span>builds na natapos</span></div>
+      <div><b>100%</b><span>legit na parts</span></div>
+      <div><b>24 oras</b><span>delivery sa Metro</span></div>
+    </div>
+  </div>
+
+  <footer class="site">© 2026 PC Shop ni Johnides • Demo project — walang totoong bayad. Presyo base sa PH market.</footer>
+</main>
+
+<!-- ===== Drawer ===== -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Cart">
+
+  <!-- CART -->
+  <div id="viewCart">
+    <div class="drawer-head">
+      <div><h3>Iyong Build List</h3><div class="sub">// CURRENT CART</div></div>
+      <button class="icon-btn" id="closeCart" aria-label="Isara">✕</button>
+    </div>
+    <div class="drawer-body" id="cartItems"></div>
+    <div class="totals" id="totals"></div>
+    <div class="drawer-foot"><button class="btn-primary" id="toCheckout">Mag-checkout</button></div>
+  </div>
+
+  <!-- CHECKOUT -->
+  <div id="viewCheckout" class="hidden">
+    <div class="drawer-head">
+      <div><h3>Detalye ng Order</h3><div class="sub">// FILL UP TO CONTINUE</div></div>
+      <button class="icon-btn" id="backToCart" aria-label="Bumalik">←</button>
+    </div>
+    <div class="drawer-body">
+      <div class="field" id="f-name">
+        <label for="i-name">Pangalan</label>
+        <input id="i-name" type="text" placeholder="Juan dela Cruz" />
+        <div class="err">Kailangan ang pangalan mo.</div>
+      </div>
+      <div class="field" id="f-addr">
+        <label for="i-addr">Delivery Address</label>
+        <textarea id="i-addr" placeholder="Blk / Lote / Street, Barangay, Lungsod"></textarea>
+        <div class="err">Ilagay ang kumpletong address.</div>
+      </div>
+      <div class="field" id="f-phone">
+        <label for="i-phone">Numero ng Telepono</label>
+        <input id="i-phone" type="tel" inputmode="numeric" placeholder="09XXXXXXXXX" maxlength="11" />
+        <div class="err">Dapat 11 digit na nagsisimula sa 09.</div>
+      </div>
+      <div class="field" id="f-pay">
+        <label>Paraan ng Bayad</label>
+        <div class="pay">
+          <label><input type="radio" name="pay" value="COD" /><span>💵 Cash on Delivery</span></label>
+          <label><input type="radio" name="pay" value="GCash" /><span>📱 GCash</span></label>
+        </div>
+        <div class="err">Pumili ng paraan ng bayad.</div>
+      </div>
+    </div>
+    <div class="totals" id="totalsCO"></div>
+    <div class="drawer-foot"><button class="btn-primary" id="placeOrder">I-place ang Order</button></div>
+  </div>
+
+  <!-- DONE -->
+  <div id="viewDone" class="hidden">
+    <div class="drawer-head">
+      <div><h3>Salamat!</h3><div class="sub">// ORDER CONFIRMED</div></div>
+    </div>
+    <div class="drawer-body">
+      <div class="confirm">
+        <div class="seal">📦</div>
+        <h3>Na-receive ang order mo</h3>
+        <div class="ono" id="orderNo">JS-0000</div>
+        <div class="recap" id="recap"></div>
+        <div class="eta">Ipo-process namin ito at i-ship sa loob ng <b>~24 oras</b>.</div>
+      </div>
+    </div>
+    <div class="drawer-foot">
+      <button class="btn-primary" id="orderAgain">Mag-shop Ulit</button>
+      <button class="btn-ghost" id="closeDone">Isara</button>
+    </div>
+  </div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ===== Hardcoded parts data (no database). Presyo base sa PH market 2025–26. ===== */
+  const PARTS = [
+    // CPU
+    { id:1,  name:"AMD Ryzen 3 3200G",     cat:"CPU", brand:"amd",     price:3750,  emoji:"🧠", spec:"4C/4T • AM4 • Vega 8" },
+    { id:2,  name:"AMD Ryzen 5 5600",      cat:"CPU", brand:"amd",     price:6200,  emoji:"🧠", spec:"6C/12T • AM4" },
+    { id:3,  name:"AMD Ryzen 7 5700X",     cat:"CPU", brand:"amd",     price:8900,  emoji:"🧠", spec:"8C/16T • AM4" },
+    { id:4,  name:"AMD Ryzen 7 7800X3D",   cat:"CPU", brand:"amd",     price:24500, emoji:"🧠", spec:"8C/16T • AM5 • 3D" },
+    { id:5,  name:"AMD Ryzen 9 7950X",     cat:"CPU", brand:"amd",     price:33000, emoji:"🧠", spec:"16C/32T • AM5" },
+    { id:6,  name:"Intel Core i3-12100F",  cat:"CPU", brand:"intel",   price:5200,  emoji:"🧠", spec:"4C/8T • LGA1700" },
+    { id:7,  name:"Intel Core i5-12400F",  cat:"CPU", brand:"intel",   price:8500,  emoji:"🧠", spec:"6C/12T • LGA1700" },
+    { id:8,  name:"Intel Core i5-14600KF", cat:"CPU", brand:"intel",   price:16500, emoji:"🧠", spec:"14C/20T • LGA1700" },
+    { id:9,  name:"Intel Core i7-14700K",  cat:"CPU", brand:"intel",   price:24900, emoji:"🧠", spec:"20C/28T • LGA1700" },
+    { id:10, name:"Intel Core i9-14900K",  cat:"CPU", brand:"intel",   price:34500, emoji:"🧠", spec:"24C/32T • LGA1700" },
+    // GPU
+    { id:11, name:"NVIDIA RTX 3060 12GB",        cat:"GPU", brand:"nvidia", price:16500, emoji:"🎮", spec:"12GB GDDR6" },
+    { id:12, name:"Zotac RTX 4060 Solo 8GB",     cat:"GPU", brand:"nvidia", price:16950, emoji:"🎮", spec:"8GB GDDR6 • 128-bit" },
+    { id:13, name:"Gigabyte RTX 4060 Aero 8GB",  cat:"GPU", brand:"nvidia", price:20850, emoji:"🎮", spec:"8GB GDDR6" },
+    { id:14, name:"Gigabyte RTX 4070 Super 12GB",cat:"GPU", brand:"nvidia", price:40950, emoji:"🎮", spec:"12GB GDDR6X" },
+    { id:15, name:"Gigabyte RTX 5070 Ti 16GB",   cat:"GPU", brand:"nvidia", price:54995, emoji:"🎮", spec:"16GB GDDR7" },
+    { id:16, name:"Asrock RX 7600 SL 8GB",       cat:"GPU", brand:"amd",    price:21695, emoji:"🎮", spec:"8GB GDDR6" },
+    { id:17, name:"Sapphire RX 7700 XT 12GB",    cat:"GPU", brand:"amd",    price:26750, emoji:"🎮", spec:"12GB GDDR6" },
+    { id:18, name:"XFX RX 9060 XT 16GB",         cat:"GPU", brand:"amd",    price:29450, emoji:"🎮", spec:"16GB GDDR6" },
+    // Motherboard
+    { id:19, name:"MSI B450M-A Pro Max II",   cat:"Motherboard", brand:"amd",     price:4200,  emoji:"🔌", spec:"AM4 • mATX • DDR4" },
+    { id:20, name:"ASRock B550M Pro4",        cat:"Motherboard", brand:"amd",     price:5800,  emoji:"🔌", spec:"AM4 • mATX • PCIe4" },
+    { id:21, name:"MSI PRO B650M-P",          cat:"Motherboard", brand:"amd",     price:7500,  emoji:"🔌", spec:"AM5 • mATX • DDR5" },
+    { id:22, name:"Gigabyte B760M DS3H",      cat:"Motherboard", brand:"intel",   price:7200,  emoji:"🔌", spec:"LGA1700 • DDR4" },
+    { id:23, name:"ASUS TUF B650-Plus WiFi",  cat:"Motherboard", brand:"amd",     price:11500, emoji:"🔌", spec:"AM5 • ATX • WiFi" },
+    // RAM
+    { id:24, name:"Corsair Vengeance 16GB",   cat:"RAM", brand:"neutral", price:2400, emoji:"📊", spec:"2x8 • DDR4-3200" },
+    { id:25, name:"G.Skill Trident Z 32GB",   cat:"RAM", brand:"neutral", price:4500, emoji:"📊", spec:"2x16 • DDR4-3600" },
+    { id:26, name:"Kingston Fury 16GB DDR5",  cat:"RAM", brand:"neutral", price:3400, emoji:"📊", spec:"2x8 • DDR5-5600" },
+    { id:27, name:"Corsair Vengeance 32GB DDR5",cat:"RAM", brand:"neutral", price:6200, emoji:"📊", spec:"2x16 • DDR5-6000" },
+    // Storage
+    { id:28, name:"Kingston NV2 500GB",       cat:"Storage", brand:"neutral", price:1500, emoji:"💾", spec:"NVMe Gen4 M.2" },
+    { id:29, name:"Teamgroup MP33 1TB",       cat:"Storage", brand:"neutral", price:2900, emoji:"💾", spec:"NVMe M.2" },
+    { id:30, name:"WD Black SN850X 2TB",      cat:"Storage", brand:"neutral", price:9200, emoji:"💾", spec:"NVMe Gen4 • 7300MB/s" },
+    { id:31, name:"Seagate Barracuda 1TB",    cat:"Storage", brand:"neutral", price:2300, emoji:"💾", spec:"HDD • 7200RPM" },
+    // PSU
+    { id:32, name:"Seasonic S12III 650W",     cat:"PSU", brand:"neutral", price:2900, emoji:"⚡", spec:"650W • 80+ Bronze" },
+    { id:33, name:"Corsair CX650M",           cat:"PSU", brand:"neutral", price:3800, emoji:"⚡", spec:"650W • Semi-modular" },
+    { id:34, name:"Seasonic Focus GX 750W",   cat:"PSU", brand:"neutral", price:5900, emoji:"⚡", spec:"750W • 80+ Gold" },
+    // Case
+    { id:35, name:"Tecware Neo Air",          cat:"Case", brand:"neutral", price:1800, emoji:"🗄️", spec:"mATX/ATX • Mesh" },
+    { id:36, name:"DarkFlash DLM21 Mesh",     cat:"Case", brand:"neutral", price:2200, emoji:"🗄️", spec:"mATX • ARGB" },
+    { id:37, name:"NZXT H510 Flow",           cat:"Case", brand:"neutral", price:4500, emoji:"🗄️", spec:"ATX • Airflow" },
+    // Cooler
+    { id:38, name:"DeepCool AK400",           cat:"Cooler", brand:"neutral", price:1400, emoji:"❄️", spec:"Air • 220W TDP" },
+    { id:39, name:"Cooler Master Hyper 212",  cat:"Cooler", brand:"neutral", price:1700, emoji:"❄️", spec:"Air • 4 heatpipes" },
+    { id:40, name:"DeepCool LE520 AIO",       cat:"Cooler", brand:"neutral", price:3200, emoji:"❄️", spec:"240mm Liquid" },
+  ];
+  /* ============================================================
+     OPTIONAL — TOTOONG LITRATO (paste mo lang ang links dito)
+     Paano:
+       1) Sa Google Images, hanapin ang exact na part.
+       2) Right-click sa litrato > "Copy image address".
+       3) Alisin ang // sa unahan ng tamang id, i-paste ang link sa " ".
+     Kung walang link o masira ito, automatic na SVG icon ang lalabas
+     (kaya di masisira ang demo mo).
+     ============================================================ */
+  const IMAGES = {
+    // ----- CPU -----
+    // 1: "",   // AMD Ryzen 3 3200G
+    // 2: "",   // AMD Ryzen 5 5600
+    // 3: "",   // AMD Ryzen 7 5700X
+    // 4: "",   // AMD Ryzen 7 7800X3D
+    // 5: "",   // AMD Ryzen 9 7950X
+    // 6: "",   // Intel Core i3-12100F
+    // 7: "",   // Intel Core i5-12400F
+    // 8: "",   // Intel Core i5-14600KF
+    // 9: "",   // Intel Core i7-14700K
+    // 10: "",  // Intel Core i9-14900K
+    // ----- GPU -----
+    // 11: "",  // NVIDIA RTX 3060 12GB
+    // 12: "",  // Zotac RTX 4060 Solo 8GB
+    // 13: "",  // Gigabyte RTX 4060 Aero 8GB
+    // 14: "",  // Gigabyte RTX 4070 Super 12GB
+    // 15: "",  // Gigabyte RTX 5070 Ti 16GB
+    // 16: "",  // Asrock RX 7600 SL 8GB
+    // 17: "",  // Sapphire RX 7700 XT 12GB
+    // 18: "",  // XFX RX 9060 XT 16GB
+    // ----- Motherboard -----
+    // 19: "",  // MSI B450M-A Pro Max II
+    // 20: "",  // ASRock B550M Pro4
+    // 21: "",  // MSI PRO B650M-P
+    // 22: "",  // Gigabyte B760M DS3H
+    // 23: "",  // ASUS TUF B650-Plus WiFi
+    // ----- RAM -----
+    // 24: "",  // Corsair Vengeance 16GB
+    // 25: "",  // G.Skill Trident Z 32GB
+    // 26: "",  // Kingston Fury 16GB DDR5
+    // 27: "",  // Corsair Vengeance 32GB DDR5
+    // ----- Storage -----
+    // 28: "",  // Kingston NV2 500GB
+    // 29: "",  // Teamgroup MP33 1TB
+    // 30: "",  // WD Black SN850X 2TB
+    // 31: "",  // Seagate Barracuda 1TB
+    // ----- PSU -----
+    // 32: "",  // Seasonic S12III 650W
+    // 33: "",  // Corsair CX650M
+    // 34: "",  // Seasonic Focus GX 750W
+    // ----- Case -----
+    // 35: "",  // Tecware Neo Air
+    // 36: "",  // DarkFlash DLM21 Mesh
+    // 37: "",  // NZXT H510 Flow
+    // ----- Cooler -----
+    // 38: "",  // DeepCool AK400
+    // 39: "",  // Cooler Master Hyper 212
+    // 40: "",  // DeepCool LE520 AIO
+  };
+
+  const CATEGORIES = ["Lahat","CPU","GPU","Motherboard","RAM","Storage","PSU","Case","Cooler"];
+  const SHIP_FEE = 200;          // flat shipping
+  const FREE_SHIP_MIN = 5000;    // libre kapag ₱5,000+ subtotal
+  const peso = n => "₱" + n.toLocaleString("en-PH");
+  const brandLabel = b => ({intel:"Intel", amd:"AMD", nvidia:"Nvidia", neutral:"Brand"})[b] || b;
+
+  /* ===== Inline SVG part graphics (embedded — di masisira, walang external file) ===== */
+  const SHAPES = {
+    "GPU": { w:84, h:56, body:`<rect class="ic-body" x="7" y="12" width="64" height="34" rx="4"/><rect class="ic-line" x="7" y="12" width="64" height="34" rx="4"/><circle class="ic-acc" cx="27" cy="29" r="9"/><circle class="ic-acc" cx="51" cy="29" r="9"/><circle class="ic-dot" cx="27" cy="29" r="2.2"/><circle class="ic-dot" cx="51" cy="29" r="2.2"/><path class="ic-line" d="M16 46v7M24 46v7M54 46v7M62 46v7"/><path class="ic-line" d="M7 20H2"/>` },
+    "CPU": { w:64, h:64, body:`<rect class="ic-body" x="16" y="16" width="32" height="32" rx="3"/><rect class="ic-line" x="16" y="16" width="32" height="32" rx="3"/><rect class="ic-acc" x="25" y="25" width="14" height="14" rx="2"/><circle class="ic-dot" cx="32" cy="32" r="2"/><path class="ic-line" d="M24 16v-5M32 16v-5M40 16v-5M24 48v5M32 48v5M40 48v5M16 24h-5M16 32h-5M16 40h-5M48 24h5M48 32h5M48 40h5"/>` },
+    "Motherboard": { w:64, h:64, body:`<rect class="ic-body" x="8" y="8" width="48" height="48" rx="3"/><rect class="ic-line" x="8" y="8" width="48" height="48" rx="3"/><rect class="ic-acc" x="15" y="14" width="14" height="14" rx="2"/><path class="ic-line" d="M40 14v16M45 14v16M50 14v16"/><rect class="ic-acc" x="14" y="40" width="30" height="5" rx="1"/><circle class="ic-dot" cx="12" cy="12" r="1.6"/><circle class="ic-dot" cx="52" cy="12" r="1.6"/><circle class="ic-dot" cx="12" cy="52" r="1.6"/><circle class="ic-dot" cx="52" cy="52" r="1.6"/>` },
+    "RAM": { w:80, h:48, body:`<rect class="ic-body" x="8" y="9" width="64" height="22" rx="2"/><rect class="ic-line" x="8" y="9" width="64" height="22" rx="2"/><rect class="ic-acc" x="14" y="14" width="9" height="8"/><rect class="ic-acc" x="28" y="14" width="9" height="8"/><rect class="ic-acc" x="42" y="14" width="9" height="8"/><rect class="ic-acc" x="56" y="14" width="9" height="8"/><path class="ic-line" d="M14 31v6M22 31v6M30 31v6M50 31v6M58 31v6M66 31v6"/><path class="ic-line" d="M37 31v5h6v-5"/>` },
+    "Storage": { w:80, h:48, body:`<rect class="ic-body" x="8" y="17" width="58" height="15" rx="2"/><rect class="ic-line" x="8" y="17" width="58" height="15" rx="2"/><rect class="ic-acc" x="15" y="21" width="18" height="7"/><rect class="ic-acc" x="38" y="21" width="11" height="7"/><path class="ic-line" d="M12 32v4M18 32v4"/><rect class="ic-line" x="66" y="20" width="8" height="8" rx="1"/><circle class="ic-dot" cx="70" cy="24" r="1.6"/>` },
+    "PSU": { w:64, h:56, body:`<rect class="ic-body" x="8" y="10" width="48" height="36" rx="3"/><rect class="ic-line" x="8" y="10" width="48" height="36" rx="3"/><circle class="ic-acc" cx="25" cy="28" r="12"/><circle class="ic-dot" cx="25" cy="28" r="2"/><path class="ic-acc" d="M25 16v6M37 28h-6M25 40v-6M13 28h6"/><rect class="ic-acc" x="44" y="16" width="7" height="5" rx="1"/><rect class="ic-line" x="44" y="30" width="7" height="8" rx="1"/>` },
+    "Case": { w:48, h:64, body:`<rect class="ic-body" x="9" y="6" width="30" height="52" rx="3"/><rect class="ic-line" x="9" y="6" width="30" height="52" rx="3"/><circle class="ic-dot" cx="24" cy="13" r="2"/><path class="ic-line" d="M15 20h18M15 25h18M15 30h18"/><rect class="ic-acc" x="15" y="44" width="18" height="9" rx="1"/>` },
+    "Cooler": { w:64, h:64, body:`<rect class="ic-body" x="10" y="10" width="44" height="44" rx="5"/><rect class="ic-line" x="10" y="10" width="44" height="44" rx="5"/><circle class="ic-acc" cx="32" cy="32" r="17"/><circle class="ic-line" cx="32" cy="32" r="5"/><circle class="ic-dot" cx="32" cy="32" r="2"/><path class="ic-acc" d="M32 15v10M49 32h-10M32 49v-10M15 32h10"/>` },
+    "default": { w:64, h:64, body:`<rect class="ic-body" x="12" y="12" width="40" height="40" rx="5"/><rect class="ic-line" x="12" y="12" width="40" height="40" rx="5"/><circle class="ic-acc" cx="32" cy="32" r="9"/>` }
+  };
+  function partIcon(cat, width) {
+    const s = SHAPES[cat] || SHAPES["default"];
+    const height = Math.round(width * s.h / s.w);
+    return `<svg viewBox="0 0 ${s.w} ${s.h}" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${s.body}</svg>`;
+  }
+
+  /* ===== State ===== */
+  let cart = {};
+  let activeCat = "Lahat";
+  let searchTerm = "";
+
+  /* ===== Elements ===== */
+  const $ = s => document.querySelector(s);
+  const grid = $("#grid"), chips = $("#chips"), badge = $("#badge");
+  const drawer = $("#drawer"), scrim = $("#scrim");
+  const cartItems = $("#cartItems"), totals = $("#totals"), totalsCO = $("#totalsCO");
+  const toastEl = $("#toast");
+
+  /* ===== Chips ===== */
+  CATEGORIES.forEach(cat => {
+    const b = document.createElement("button");
+    b.className = "chip" + (cat === activeCat ? " active" : "");
+    b.textContent = cat;
+    b.onclick = () => {
+      activeCat = cat;
+      document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      b.classList.add("active");
+      renderParts();
+    };
+    chips.appendChild(b);
+  });
+
+  /* ===== Render catalog (filter by category + search name/brand) ===== */
+  function renderParts() {
+    const term = searchTerm.trim().toLowerCase();
+    const items = PARTS.filter(p =>
+      (activeCat === "Lahat" || p.cat === activeCat) &&
+      (term === "" || p.name.toLowerCase().includes(term) || p.brand.toLowerCase().includes(term) || p.cat.toLowerCase().includes(term))
+    );
+    grid.innerHTML = "";
+    if (items.length === 0) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><span class="big">🔎</span>Walang “${searchTerm}” na nahanap. Subukan ang ibang keyword.</div>`;
+      return;
+    }
+    items.forEach(p => {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="thumb">
+          <span class="pill ${p.brand}">${brandLabel(p.brand)}</span>
+          ${partIcon(p.cat, 92)}
+          ${(p.img || IMAGES[p.id]) ? `<img class="photo" src="${p.img || IMAGES[p.id]}" alt="${p.name}" loading="lazy" onerror="this.remove()"/>` : ""}
+        </div>
+        <div class="body">
+          <div class="name">${p.name}</div>
+          <div class="spec">${p.spec}</div>
+          <div class="row">
+            <span class="price">${peso(p.price)}</span>
+            <button class="add" data-add="${p.id}">+ Idagdag</button>
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  }
+
+  /* ===== Cart logic ===== */
+  function addToCart(id) {
+    cart[id] = (cart[id] || 0) + 1;
+    updateBadge(true);
+    renderCart();
+    showToast(`Naidagdag: ${PARTS.find(p => p.id === id).name}`);
+  }
+  function changeQty(id, d) { cart[id] = (cart[id] || 0) + d; if (cart[id] <= 0) delete cart[id]; updateBadge(false); renderCart(); }
+  function removeItem(id) { delete cart[id]; updateBadge(false); renderCart(); }
+  function cartCount() { return Object.values(cart).reduce((a,b)=>a+b,0); }
+  function subtotal() { return Object.entries(cart).reduce((s,[id,q])=>s+PARTS.find(p=>p.id==id).price*q,0); }
+  function shipping() { const sub = subtotal(); if (cartCount()===0) return 0; return sub >= FREE_SHIP_MIN ? 0 : SHIP_FEE; }
+
+  function updateBadge(bump) {
+    const c = cartCount();
+    badge.textContent = c;
+    badge.classList.toggle("show", c > 0);
+    if (bump) { badge.classList.remove("bump"); void badge.offsetWidth; badge.classList.add("bump"); }
+  }
+
+  function totalsMarkup() {
+    const sub = subtotal(), ship = shipping();
+    const shipTxt = (cartCount() > 0 && ship === 0) ? "LIBRE" : peso(ship);
+    return `
+      <div class="t-row"><span>Subtotal</span><span>${peso(sub)}</span></div>
+      <div class="t-row"><span>Shipping</span><span>${shipTxt}</span></div>
+      <div class="t-row grand"><span>Total</span><span>${peso(sub + ship)}</span></div>`;
+  }
+
+  function renderCart() {
+    const ids = Object.keys(cart);
+    if (ids.length === 0) {
+      cartItems.innerHTML = `<div class="cart-empty"><span class="big">🛒</span>Walang laman ang build list mo.<br/>Pumili muna ng parts!</div>`;
+      totals.innerHTML = "";
+      $("#toCheckout").disabled = true;
+    } else {
+      cartItems.innerHTML = "";
+      ids.forEach(id => {
+        const p = PARTS.find(x => x.id == id), q = cart[id];
+        const row = document.createElement("div");
+        row.className = "line-item";
+        row.innerHTML = `
+          <div class="emoji">${partIcon(p.cat, 30)}</div>
+          <div class="info">
+            <div class="nm">${p.name}</div>
+            <div class="pr">${peso(p.price)} × ${q} = ${peso(p.price*q)}</div>
+            <button class="rm" data-rm="${id}">tanggalin</button>
+          </div>
+          <div class="qty">
+            <button data-dec="${id}" aria-label="Bawasan">−</button>
+            <span class="count">${q}</span>
+            <button data-inc="${id}" aria-label="Dagdagan">+</button>
+          </div>`;
+        cartItems.appendChild(row);
+      });
+      totals.innerHTML = totalsMarkup();
+      $("#toCheckout").disabled = false;
+    }
+    totalsCO.innerHTML = totalsMarkup();
+  }
+
+  /* ===== Drawer ===== */
+  function openDrawer() { drawer.classList.add("open"); scrim.classList.add("open"); showView("cart"); }
+  function closeDrawer() { drawer.classList.remove("open"); scrim.classList.remove("open"); }
+  function showView(v) {
+    $("#viewCart").classList.toggle("hidden", v !== "cart");
+    $("#viewCheckout").classList.toggle("hidden", v !== "checkout");
+    $("#viewDone").classList.toggle("hidden", v !== "done");
+    drawer.querySelectorAll(".drawer-body").forEach(b => b.scrollTop = 0);
+  }
+
+  /* ===== Validation ===== */
+  function setInvalid(id, bad) { $(id).classList.toggle("invalid", bad); }
+  function validateCheckout() {
+    const name = $("#i-name").value.trim();
+    const addr = $("#i-addr").value.trim();
+    const phone = $("#i-phone").value.trim();
+    const pay = document.querySelector('input[name="pay"]:checked');
+    const badName = name === "", badAddr = addr === "", badPhone = !/^09\d{9}$/.test(phone), badPay = !pay;
+    setInvalid("#f-name", badName); setInvalid("#f-addr", badAddr);
+    setInvalid("#f-phone", badPhone); setInvalid("#f-pay", badPay);
+    return !(badName || badAddr || badPhone || badPay);
+  }
+
+  function placeOrder() {
+    if (cartCount() === 0) { showToast("Walang laman ang cart."); return; }
+    if (!validateCheckout()) { showToast("Kumpletuhin ang mga detalye."); return; }
+
+    const orderNo = "JS-" + Math.floor(1000 + Math.random()*9000);
+    $("#orderNo").textContent = orderNo;
+
+    const sub = subtotal(), ship = shipping();
+    let rows = Object.entries(cart).map(([id,q]) => {
+      const p = PARTS.find(x => x.id == id);
+      return `<div class="r"><span>${q}× ${p.name}</span><span>${peso(p.price*q)}</span></div>`;
+    }).join("");
+    rows += `<div class="r"><span>Shipping</span><span>${ship===0?"LIBRE":peso(ship)}</span></div>`;
+    rows += `<div class="r" style="font-weight:700;margin-top:6px"><span>TOTAL</span><span>${peso(sub+ship)}</span></div>`;
+    $("#recap").innerHTML = rows;
+
+    showView("done");
+
+    cart = {};
+    updateBadge(false);
+    renderCart();
+    $("#i-name").value = $("#i-addr").value = $("#i-phone").value = "";
+    document.querySelectorAll('input[name="pay"]').forEach(r => r.checked = false);
+    document.querySelectorAll(".field").forEach(f => f.classList.remove("invalid"));
+  }
+
+  /* ===== Toast ===== */
+  let toastTimer;
+  function showToast(msg) {
+    toastEl.textContent = msg; toastEl.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1800);
+  }
+
+  /* ===== Theme ===== */
+  $("#themeBtn").onclick = () => {
+    const root = document.documentElement;
+    const isLight = root.getAttribute("data-theme") === "light";
+    root.setAttribute("data-theme", isLight ? "dark" : "light");
+    $("#themeBtn").textContent = isLight ? "☀️" : "🌙";
+  };
+
+  /* ===== Scroll spy nav ===== */
+  const navLinks = document.querySelectorAll("#nav a");
+  const sections = ["parts","paano","tungkol"].map(id => document.getElementById(id));
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id));
+    }});
+  }, { rootMargin: "-45% 0px -50% 0px" });
+  sections.forEach(s => s && spy.observe(s));
+
+  /* ===== Wiring ===== */
+  $("#search").addEventListener("input", e => { searchTerm = e.target.value; renderParts(); });
+  grid.addEventListener("click", e => { const b = e.target.closest("[data-add]"); if (b) addToCart(+b.dataset.add); });
+  cartItems.addEventListener("click", e => {
+    const inc = e.target.closest("[data-inc]"), dec = e.target.closest("[data-dec]"), rm = e.target.closest("[data-rm]");
+    if (inc) changeQty(+inc.dataset.inc, +1);
+    else if (dec) changeQty(+dec.dataset.dec, -1);
+    else if (rm) removeItem(+rm.dataset.rm);
+  });
+  $("#cartBtn").onclick = openDrawer;
+  $("#closeCart").onclick = closeDrawer;
+  $("#closeDone").onclick = closeDrawer;
+  $("#scrim").onclick = closeDrawer;
+  $("#toCheckout").onclick = () => { if (cartCount() > 0) showView("checkout"); };
+  $("#backToCart").onclick = () => showView("cart");
+  $("#placeOrder").onclick = placeOrder;
+  $("#orderAgain").onclick = () => showView("cart");
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeDrawer(); });
+
+  /* ===== Init ===== */
+  renderParts();
+  renderCart();
+  updateBadge(false);
+</script>
+</body>
+</html>
